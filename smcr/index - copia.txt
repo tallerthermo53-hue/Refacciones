@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SMCR · Seguimiento de Refacciones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #e6f0fa;
+  }
+  header {
+    background: #007bff;
+    color: #fff;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+  }
+  header div { font-weight: bold; }
+  .contenedor {
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #333;
+  }
+  input, select, textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  .acciones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  button {
+    padding: 10px 20px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0056b3;
+  }
+  .nav-bottom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .oculto { display: none; }
+  .tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  .tabla th, .tabla td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.activo {
+    display: flex;
+  }
+  .modal-contenido {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>mabe</div>
+  <div>Sistema de Monitoreo y Control de Refacciones</div>
+  <div>Taller Thermo</div>
+</header>
+
+<!-- Sección Captura -->
+<div class="contenedor" id="seccion-captura">
+  <h3>Captura de solicitud de refacción</h3>
+  <form id="form-solicitud" enctype="multipart/form-data">
+    <label>Número de Troquel * <input type="text" name="numero_troquel" required></label>
+    <label>Paso * <input type="text" name="paso" required></label>
+    <label>Descripción de la pieza * <textarea name="descripcion" required></textarea></label>
+    <label>Número de Detalle (opcional) <input type="text" name="detalle"></label>
+    <label>Cantidad solicitada * <input type="number" name="cantidad" required></label>
+    <label>Razón de cambio *
+      <select name="razon" id="razon" required>
+        <option value="">Selecciona...</option>
+        <option>Desgaste</option>
+        <option>Exceso de calzas</option>
+        <option>Con poca vida o sin vida</option>
+        <option>Fractura</option>
+        <option>Para refaccionamiento</option>
+        <option>Para mejora</option>
+        <option>Otro</option>
+      </select>
+    </label>
+    <label id="razon_otro_wrap" class="oculto">Especifica la razón <input type="text" name="razon_otro"></label>
+    <label>Prioridad *
+      <select name="prioridad" required>
+        <option>Baja</option><option>Media</option><option>Alta</option><option>Urgente</option>
+      </select>
+    </label>
+    <label>Matricero que solicita *
+      <select name="matricero" required>
+        <option value="">Selecciona...</option>
+        <option>Alberto Arellano</option>
+        <option>Valentin Trujillo</option>
+        <option>Juan Jose</option>
+        <option>Miguel Rostro</option>
+        <option>Isaac Armendariz</option>
+        <option>Osvaldo Rodriguez</option>
+        <option>Jorge Acosta</option>
+        <option>Jaime de Lira</option>
+        <option>Francisco Vazquez Velazquez</option>
+        <option>Alejandro Borrego</option>
+        <option>Reynaldo Fabian</option>
+        <option>Fernando</option>
+        <option>Francisco Vazquez Torres</option>
+        <option>Aaron Hernandez</option>
+        <option>Rodrigo Bustos</option>
+        <option>Yhair Hernandez</option>
+        <option>Ramon Mora</option>
+        <option>Alfredo Colin</option>
+        <option>Daniel Segovia</option>
+        <option>Manuel Segura</option>
+        <option>Martin Davila</option>
+        <option>Gerardo Trillo</option>
+        <option>Saul Urbina</option>
+        <option>Alejandro</option>
+        <option>Luis Melo</option>
+      </select>
+    </label>
+    <label>Parte de troquel *
+      <select name="parte" required><option>Superior</option><option>Inferior</option></select>
+    </label>
+    <label>Pieza *
+      <select name="pieza" required><option>Mostrada</option><option>Opuesta</option></select>
+    </label>
+    <label>Imagen de la refacción (opcional) <input type="file" name="imagen" accept="image/*"></label>
+  </form>
+
+  <div class="acciones">
+    <button type="submit" form="form-solicitud">Guardar solicitud</button>
+    <button type="reset" form="form-solicitud">Limpiar todo</button>
+  </div>
+
+  <div class="nav-bottom">
+    <button id="btn-tabla">Ir a tabla de seguimiento</button>
+    <button id="btn-admin">Administrador</button>
+  </div>
+</div>
+
+<!-- Sección Tabla -->
+<div class="contenedor oculto" id="seccion-tabla">
+  <h3>Tabla de seguimiento</h3>
+  
+  <!-- Filtro por número de troquel -->
+  <div class="acciones" style="justify-content: flex-start;">
+    <input type="text" id="filtro-troquel" placeholder="Buscar por Nº de troquel" style="width: 250px;">
+    <button id="btn-aplicar-filtros">Aplicar filtro</button>
+    <button id="btn-limpiar-filtros">Limpiar</button>
+  </div>
+  
+  <table class="tabla" id="tabla-solicitudes">
+    <thead>
+      <tr>
+        <th>Fecha</th><th>Nº Troquel</th><th>Paso</th><th>Descripción</th><th>Detalle</th>
+        <th>Cantidad</th><th>Razón</th><th>Prioridad</th><th>Parte</th><th>Pieza</th>
+        <th>Imagen</th><th>Estatus</th><th>Tipo de acero</th><th>Dimensiones</th>
+        <th>ID seguimiento</th><th>Últ. act.</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Botón para volver a captura -->
+  <div class="nav-bottom">
+    <button id="btn-volver-captura">Volver a Captura</button>
+    <button id="btn-ir-admin">Ir a Administrador</button>
+  </div>
+</div>
+
+<!-- Sección Administrador -->
+<div class="contenedor oculto" id="seccion-admin">
+  <h3>Administrador</h3>
+  <canvas id="chart-razones" width="400" height="200"></canvas>
+  <div class="nav-bottom">
+    <button id="btn-volver-captura2">Volver a Captura</button>
+    <button id="btn-ir-tabla">Ir a Tabla</button>
+  </div>
+</div>
+
+<!-- Modal Seguimiento -->
+<div id="modal-seguimiento" class="modal">
+  <div class="modal-contenido">
+    <h4>Seguimiento de solicitud</h4>
+    <form id="form-seguimiento">
+      <input type="hidden" name="solicitud_id" id="seguimiento_solicitud_id">
+      <input type="hidden" name="seguimiento_id" id="seguimiento_id">
+      <label>Tipo de acero <input type="text" name="tipo_acero"></label>
+      <label>Dimensiones <input type="text" name="dimensiones"></label>
+      <label>Estatus
+        <select name="estatus">
+          <option value="">—</option>
+          <option>En proceso</option>
+          <option>Habilito acero</option>
+          <option>Material escuadrado</option>
+          <option>Material rectificado para maquinado</option>
+          <option>Maquinado en CNC</option>
+          <option>Erosionado</option>
+          <option>Templado</option>
+          <option>Material rectificado</option>
+          <option>Terminada para implementar</option>
+          <option>Refaccion Implementada</option>
+        </select>
+      </label>
+      <label>Comentario <textarea name="comentario"></textarea></label>
+      <div class="acciones">
+        <button type="button" id="btn-cerrar-seg">Cerrar</button>
+        <button type="submit">Guardar seguimiento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Navegación entre secciones
+const captura = document.getElementById('seccion-captura');
+const tabla = document.getElementById('seccion-tabla');
+const admin = document.getElementById('seccion-admin');
+
+document.getElementById('btn-tabla').onclick = () => { tabla.classList.remove('oculto'); captura.classList.add('oculto'); admin.classList.add('oculto'); cargarSolicitudes(); };
+document.getElementById('btn-admin').onclick = () => { admin.classList.remove('oculto'); captura.classList.add('oculto'); tabla.classList.add('oculto'); };
+document.getElementById('btn-volver-captura').onclick = () => { captura.classList.remove('oculto'); tabla.classList.add('oculto'); admin.classList.add('oculto'); };
+document.getElementById('btn-ir-admin').onclick = () => { admin.classList.remove('oculto'); captura.classList.add('oculto'); tabla.classList.add('oculto'); };
+document.getElementById('btn-volver-captura2').onclick = () => { captura.classList.remove('oculto'); tabla.classList.add('oculto'); admin.classList.add('oculto'); };
+document.getElementById('btn-ir-tabla').onclick = () => { tabla.classList.remove('oculto'); captura.classList.add('oculto'); admin.classList.add('oculto'); cargarSolicitudes(); };
+
+// Mostrar campo "Otro"
+const razonSel = document.getElementById('razon');
+const razonWrap = document.getElementById('razon_otro_wrap');
+razonSel.addEventListener('change', () => {
+  razonWrap.classList.toggle('oculto', razonSel.value !== 'Otro');
+});
+
+// Guardar solicitud
+document.getElementById('form-solicitud').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  try {
+    const r = await fetch('api/solicitudes_create.php', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    alert('Solicitud guardada. ID: ' + j.id);
+    e.target.reset();
+  } catch (err) { alert('Error: ' + err.message); }
+});
+
+// Filtro por troquel
+document.getElementById('btn-aplicar-filtros').onclick = () => {
+  cargarSolicitudes(document.getElementById('filtro-troquel').value.trim());
+};
+document.getElementById('btn-limpiar-filtros').onclick = () => {
+  document.getElementById('filtro-troquel').value = '';
+  cargarSolicitudes();
+};
+
+// Cargar tabla con filtro opcional
+async function cargarSolicitudes(filtro = '') {
+  const tbody = document.querySelector('#tabla-solicitudes tbody');
+  tbody.innerHTML = '<tr><td colspan="17">Cargando...</td></tr>';
+  try {
+    const url = filtro ? `api/solicitudes_list.php?troquel=${encodeURIComponent(filtro)}` : 'api/solicitudes_list.php';
+    const r = await fetch(url);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    tbody.innerHTML = '';
+    j.data.forEach(it => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${it.fecha}</td><td>${it.numero_troquel}</td><td>${it.paso}</td><td>${it.descripcion}</td>
+        <td>${it.detalle||''}</td><td>${it.cantidad}</td><td>${it.razon}</td><td>${it.prioridad}</td>
+        <td>${it.parte}</td><td>${it.pieza}</td><td>${it.imagen ? '<a href="'+it.imagen+'" target="_blank">Ver</a>' : ''}</td>
+        <td>${it.estatus||''}</td><td>${it.tipo_acero||''}</td><td>${it.dimensiones||''}</td>
+        <td>${it.seguimiento_id||''}</td><td>${it.ultima_actualizacion||''}</td>
+        <td><button data-id="${it.id}" data-segid="${it.seguimiento_id||''}">Editar</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="17">Error: '+err.message+'</td></tr>';
+  }
+}
+
+// Modal seguimiento
+const modalSeg = document.getElementById('modal-seguimiento');
+document.querySelector('#tabla-solicitudes').addEventListener('click', async e => {
+  const btn = e.target.closest('button[data-id]');
+  if (!btn) return;
+  document.getElementById('seguimiento_solicitud_id').value = btn.dataset.id;
+  document.getElementById('seguimiento_id').value = btn.dataset.segid;
+  modalSeg.classList.add('activo');
+});
+document.getElementById('btn-cerrar-seg').addEventListener('click', () => modalSeg.classList.remove('activo'));
+document.getElementById('form-seguimiento').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  try {
+    const r = await fetch('api/seguimiento_upsert.php', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    alert('Seguimiento guardado.');
+    modalSeg.classList.remove('activo');
+    cargarSolicitudes();
+  } catch (err) { alert('Error: ' + err.message); }
+});
+</script>
+</body>
+</html>
